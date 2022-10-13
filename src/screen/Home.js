@@ -1,5 +1,5 @@
-import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import { useIsFocused, useNavigation } from '@react-navigation/native';
+import React, { useEffect } from 'react';
 import {
   Text,
   View,
@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StatusBar,
   ScrollView,
+  ToastAndroid
 } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import { openDatabase } from 'react-native-sqlite-storage';
@@ -24,10 +25,19 @@ var db = openDatabase(
 export default function Home() {
   const { width, height } = Dimensions.get('window');
   const navigation = useNavigation();
+  const focused = useIsFocused();
 
   const [user, setUser] = React.useState([]);
 
   React.useEffect(() => {
+    getData();
+
+    if (focused) {
+      console.log('called');
+    }
+  }, [focused]);
+
+  const getData = () => {
     db.transaction(tx => {
       tx.executeSql(
         'SELECT * FROM user;',
@@ -53,12 +63,12 @@ export default function Home() {
               });
             }
 
-            // console.log(newListData);
+            // console.log(newListData.length);
 
             // Alert.alert('Info', JSON.stringify(newListData));
             setUser(newListData);
           } else {
-            // Alert.alert('Info', 'Tidak ada data');
+            setUser([]);
           }
         },
         err => {
@@ -66,7 +76,95 @@ export default function Home() {
         },
       );
     });
-  }, []);
+  }
+
+  const navigateToResult = (id) => {
+    navigation.navigate('Result', { id: id });
+  }
+
+  const deleteData = (inputUserId) => {
+    db.transaction((tx) => {
+      tx.executeSql(
+        'DELETE FROM user where id_user=?',
+        [inputUserId],
+        (tx, results) => {
+          console.log('Terdelete', results.rowsAffected);
+          if (results.rowsAffected > 0) {
+            ToastAndroid.show('Data berhasil dihapus!!!', ToastAndroid.SHORT);
+            getData();
+          } else {
+            ToastAndroid.show('Error!!!', ToastAndroid.SHORT);
+            getData();
+          }
+        }
+      );
+    });
+  }
+
+  useEffect(() => {
+    console.log(user);
+  }, [user])
+  
+
+  const generateCard = (user, i) => {
+    if (user.hb >= 10 && user.hb <= 13) {
+      return(
+      <View key={i} style={{ backgroundColor: '#dddddd', display: 'flex', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+        <TouchableOpacity onPress={() => navigateToResult(user.id_user)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#007bff', width: width / 10, height: width / 10, marginRight: width / 20, borderRadius: 1000 }}></View>
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: '600' }}>{user.nama}</Text>
+            <Text>Tes Terakhir {new Date(user.date).toLocaleDateString()}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => deleteData(user.id_user)} style={{ marginRight: width / 20 }}>
+          <Icon name='trash' size={25} color='#282828' />
+        </TouchableOpacity>
+      </View>)
+    } else if (user.hb >= 8 && user.hb <= 9.9) {
+      return(
+      <View key={i} style={{ backgroundColor: '#dddddd', display: 'flex', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+        <TouchableOpacity onPress={() => navigateToResult(user.id_user)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#28a745', width: width / 10, height: width / 10, marginRight: width / 20, borderRadius: 1000 }}></View>
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: '600' }}>{user.nama}</Text>
+            <Text>Tes Terakhir {new Date(user.date).toLocaleDateString()}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => deleteData(user.id_user)} style={{ marginRight: width / 20 }}>
+          <Icon name='trash' size={25} color='#282828' />
+        </TouchableOpacity>
+      </View>)
+    } else if (user.hb >= 6 && user.hb <= 7.9) {
+      return(
+      <View key={i} style={{ backgroundColor: '#dddddd', display: 'flex', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+        <TouchableOpacity onPress={() => navigateToResult(user.id_user)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#ffc107', width: width / 10, height: width / 10, marginRight: width / 20, borderRadius: 1000 }}></View>
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: '600' }}>{user.nama}</Text>
+            <Text>Tes Terakhir {new Date(user.date).toLocaleDateString()}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => deleteData(user.id_user)} style={{ marginRight: width / 20 }}>
+          <Icon name='trash' size={25} color='#282828' />
+        </TouchableOpacity>
+      </View>)
+    } else if (user.hb < 6) {
+      return(
+      <View key={i} style={{ backgroundColor: '#dddddd', display: 'flex', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 15 }}>
+        <TouchableOpacity onPress={() => navigateToResult(user.id_user)} style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <View style={{ backgroundColor: '#dc3545', width: width / 10, height: width / 10, marginRight: width / 20, borderRadius: 1000 }}></View>
+          <View>
+            <Text style={{ fontSize: 18, fontWeight: '600' }}>{user.nama}</Text>
+            <Text>Tes Terakhir {new Date(user.date).toLocaleDateString()}</Text>
+          </View>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => deleteData(user.id_user)} style={{ marginRight: width / 20 }}>
+          <Icon name='trash' size={25} color='#282828' />
+        </TouchableOpacity>
+      </View>)
+    }
+  }
 
   return (
     <View style={{ height: height }}>
@@ -95,13 +193,7 @@ export default function Home() {
       }}>
         <ScrollView>
           {user.map((user, i) => (
-            <View key={i} style={{ backgroundColor: '#dddddd', display: 'flex', padding: 15, borderRadius: 10, flexDirection: 'row', alignItems: 'center', marginBottom: 15 }}>
-              <View style={{ backgroundColor: '#FF7979', width: width / 10, height: width / 10, marginRight: width / 20, borderRadius: 1000 }}></View>
-              <View>
-                <Text style={{ fontSize: 18, fontWeight: '600' }}>{user.nama}</Text>
-                <Text>Tes Terakhir {new Date(user.date).toLocaleDateString()}</Text>
-              </View>
-            </View>
+            generateCard(user, i)
           ))}
         </ScrollView>
       </View>

@@ -20,7 +20,7 @@ import CheckBox from 'react-native-check-box';
 var db = openDatabase(
   {name: 'tamia.db', createFromLocation: 1},
   () => {
-    Alert.alert('Info', 'Sukses loading database SQLite');
+    // Alert.alert('Info', 'Sukses loading database SQLite');
   },
   err => {
     console.log(err);
@@ -66,7 +66,7 @@ export default function Form2() {
         parseInt(route.params.umur),
         parseInt(beratBadan),
         parseInt(tinggiBadan),
-        parseInt(HB),
+        parseFloat(HB),
         periodeMens,
         polaMakan,
         konsumsiObatFE,
@@ -80,7 +80,7 @@ export default function Form2() {
             parseInt(route.params.umur),
             parseInt(beratBadan),
             parseInt(tinggiBadan),
-            parseInt(HB),
+            parseFloat(HB.replace(/,/g, '.')),
             periodeMens,
             polaMakan,
             konsumsiObatFE,
@@ -221,7 +221,7 @@ export default function Form2() {
           <Text style={{color: '#282828', marginBottom: 5}}>HB saat ini</Text>
           <TextInput
             value={HB}
-            onChangeText={text => setHB(text.replace(/[^0-9]/g, ''))}
+            onChangeText={text => setHB(text.replace(/[^0-9,]/g, ''))}
             style={{
               borderWidth: 1,
               borderRadius: 7,

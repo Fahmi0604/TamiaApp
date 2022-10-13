@@ -9,6 +9,7 @@ import {
   Alert,
   Dimensions,
   StatusBar,
+  ToastAndroid
 } from 'react-native';
 // import Icon from 'react-native-vector-icons/FontAwesome';
 import {useNavigation} from '@react-navigation/native';
@@ -56,6 +57,18 @@ export default function Form1() {
   //     }
   //   };
 
+  const navigateToForm2 = () => {
+    if (nama !== '' && umur !== '') {
+      navigation.navigate('Form2', {nama, umur});
+    }else {
+      toastEmptyForm();
+    }
+  }
+
+  const toastEmptyForm = () => {
+    ToastAndroid.show('Mohon Lengkapi Form!!!', ToastAndroid.SHORT);
+  };
+
   return (
     <ScrollView>
       <StatusBar backgroundColor={'#f2f2f2'} barStyle="dark-content" />
@@ -98,7 +111,7 @@ export default function Form1() {
         </View>
 
         <TouchableOpacity
-          onPress={() => navigation.navigate('Form2', {nama, umur})}
+          onPress={() => navigateToForm2()}
           style={{
             width: (width / 10) * 9,
             backgroundColor: '#047857',
